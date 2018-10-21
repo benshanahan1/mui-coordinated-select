@@ -16,7 +16,7 @@ npm start
 
 ## Usage
 
-Example component usage looks like this:
+The component in the above animated GIF is written like so:
 
 ```jsx
 <CoordinatedSelect
