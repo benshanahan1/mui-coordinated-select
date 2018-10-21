@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Grid from '@material-ui/core/Grid';
@@ -6,9 +7,8 @@ import Grid from '@material-ui/core/Grid';
 class CoordinatedSelect extends React.Component {
 	constructor(props) {
 		super(props);
-		const startingDepth = props.selectValues.length - 1;
 		this.state = {
-			selectDepth: startingDepth,
+			selectDepth: props.selectValues.length - 1,
 		};
 	}
 
@@ -53,6 +53,7 @@ class CoordinatedSelect extends React.Component {
 			selectValues.push(value);
 		}
 
+		// Update state.
 		this.setState({ selectDepth: depth });
 		this.props.valueUpdater(selectValues);
 	};
@@ -69,7 +70,7 @@ class CoordinatedSelect extends React.Component {
 			const disabled = (i > selectDepth + 1);
 
 			jsx.push(
-				<Grid xs={3} key={i} item>
+				<Grid xs={this.props.xsBreakpoint} key={i} item>
 					<TextField
 						fullWidth
 						select
@@ -77,7 +78,7 @@ class CoordinatedSelect extends React.Component {
 						value={thisValue}
 						onChange={(e) => 
 							this.onChange(thisIndex, e.target.value)}
-						variant='standard'
+						variant={this.props.variant}
 						label={labels[i]}
 					>
 						<MenuItem value=''><em>None</em></MenuItem>
@@ -96,11 +97,17 @@ class CoordinatedSelect extends React.Component {
 
 	render() {
 		return (
-			<Grid container spacing={24}>
+			<Grid container spacing={this.props.spacing}>
 				{ this.createSelects() }
 			</Grid>
 		);
 	}
+}
+
+CoordinatedSelect.defaultProps = {
+	variant: 'standard',
+	spacing: 24,
+	xsBreakpoint: 6,
 }
 
 export default CoordinatedSelect;

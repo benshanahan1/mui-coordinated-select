@@ -58,6 +58,9 @@ class App extends React.Component {
 							options={OPTIONS}
 							labels={LABELS}
 							nLevels={N_LEVELS}
+							variant='standard'
+							spacing={24}
+							xsBreakpoint={3}
 							selectValues={this.state.selectValues}
 							valueUpdater={this.updateSelectValues.bind(this)}
 						/>
