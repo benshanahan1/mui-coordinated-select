@@ -20,7 +20,7 @@ const styles = theme => ({
 		textAlign: 'center',
 	},
 	card: {
-		width: '50%',
+		width: '60%',
 		maxWidth: '800px',
 		margin: '0 auto',
 	},
@@ -28,38 +28,45 @@ const styles = theme => ({
 });
 
 /* Data */
-const category = ['numbers', 'symbols'];
-const subcategory = {
+const first = ['numbers', 'symbols'];
+const second = {
 	numbers: ['one', 'two', 'three', 'four'],
 	symbols: ['&', '?', '!', '$'],
 };
 
 class App extends React.Component {
 	state = {
-		firstSelect: subcategory[category[0]],
-		firstSelectValue: category[0],
-		secondSelect: subcategory[category[0]][0],
+		firstSelectOptions: second[first[0]],
+		firstSelectValue: first[0],
+		secondSelectValue: second[first[0]][0],
 	};
 
-	onCategoryChange = (event) => {
+	onChange = (selectNumber, value) => {
+		this.setState(prevState => ({
+			selectNumber: selectNumber,
+			selectValues: prevStates[selectNumber], 
+		}));
+	};
+
+	onFirstChange = (event) => {
 		const value = event.target.value;
 		this.setState({
-			firstSelect: subcategory[value],
+			firstSelectOptions: second[value],
 			firstSelectValue: value,
-			secondSelect: '',
+			secondSelectValue: '',
 		});
 	};
 
-	onSubcategoryChange = (event) => {
+	onSecondChange = (event) => {
 		const value = event.target.value;
 		this.setState({
-			secondSelect: value,
+			secondSelectValue: value,
 		});
 	};
 
 	render() {
 		const { classes } = this.props;
-		const { firstSelect, firstSelectValue, secondSelect } = this.state;
+		const { firstSelectOptions, firstSelectValue, secondSelectValue } = this.state;
 
 		return (
 			<div className={classes.root}>
@@ -79,11 +86,11 @@ class App extends React.Component {
 									fullWidth
 									select
 									value={firstSelectValue}
-									onChange={this.onCategoryChange}
+									onChange={this.onFirstChange}
 									variant='outlined'
-									label='Category'
+									label='First'
 								>
-									{category.map(option => (
+									{first.map(option => (
 										<MenuItem key={option} value={option}>
 											{option}
 										</MenuItem>
@@ -94,13 +101,13 @@ class App extends React.Component {
 								<TextField
 									fullWidth
 									select
-									value={secondSelect}
-									label='Subcategory'
-									onChange={this.onSubcategoryChange}
+									value={secondSelectValue}
+									label='Second'
+									onChange={this.onSecondChange}
 									variant='outlined'
 								>
 									<MenuItem value=''><em>None</em></MenuItem>
-									{firstSelect.map(option => (
+									{firstSelectOptions.map(option => (
 										<MenuItem key={option} value={option}>
 											{option}
 										</MenuItem>
