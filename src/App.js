@@ -28,20 +28,41 @@ const styles = theme => ({
 });
 
 /* Data */
-const LABELS = ['First level', 'Second level', 'Third level'];
+const LABELS = ['First level', 'Second level', 'Third level', 'Fourth level'];
+const N_LEVELS = 4;
 const OPTIONS = {
 	numbers: {
-		one:   [1, 2, 3],
-		two:   [2, 4, 6],
-		three: [3, 6, 9],
+		one: {
+			'1': ['111','222','333'],
+			'2': ['222','444','666'],
+			'3': ['333','666','999'],
+		},
+		two: {
+			'2': ['222','444','666'],
+			'4': ['444','888','121212'],
+			'6': ['666','121212','181818'],
+		},
+		three: {
+			'3': ['333','666','999'],
+			'6': ['666','121212','181818'],
+			'9': ['999','181818','272727'],
+		},
 	},
 	letters: {
-		a: ['a', 'A', '4'],
-		e: ['e', 'E', '3'],
-		s: ['s', 'S', '$'],
+		a: {
+			'a': ['aaa','bbb','ccc'],
+			'A': ['AAA','BBB','CCC'],
+		},
+		e: {
+			'e': ['eee','fff','ggg'],
+			'E': ['EEE','FFF','GGG'],
+		},
+		s: {
+			's': ['sss','ttt','uuu'],
+			'S': ['SSS','TTT','UUU'],
+		},
 	},
 };
-const N_LEVELS = 3;
 
 class App extends React.Component {
 	constructor(props) {
@@ -110,7 +131,7 @@ class App extends React.Component {
 			const disabled = (i > selectDepth + 1);
 
 			jsx.push(
-				<Grid xs={4} key={i} item>
+				<Grid xs={3} key={i} item>
 					<TextField
 						fullWidth
 						select
@@ -118,7 +139,7 @@ class App extends React.Component {
 						value={thisValue}
 						onChange={(e) => 
 							this.onChange(thisIndex, e.target.value)}
-						variant='outlined'
+						variant='standard'
 						label={LABELS[i]}
 					>
 						<MenuItem value=''><em>None</em></MenuItem>
