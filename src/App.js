@@ -28,45 +28,115 @@ const styles = theme => ({
 });
 
 /* Data */
-const first = ['numbers', 'symbols'];
-const second = {
-	numbers: ['one', 'two', 'three', 'four'],
-	symbols: ['&', '?', '!', '$'],
+const LABELS = ['First level', 'Second level', 'Third level'];
+const OPTIONS = {
+	numbers: {
+		one:   [1, 2, 3],
+		two:   [2, 4, 6],
+		three: [3, 6, 9],
+	},
+	letters: {
+		a: ['a', 'A', '4'],
+		e: ['e', 'E', '3'],
+		s: ['s', 'S', '$'],
+	},
 };
+const N_LEVELS = 3;
 
 class App extends React.Component {
-	state = {
-		firstSelectOptions: second[first[0]],
-		firstSelectValue: first[0],
-		secondSelectValue: second[first[0]][0],
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			selectDepth: -1,
+			selectValues: [],
+		};
+	}
 
-	onChange = (selectNumber, value) => {
-		this.setState(prevState => ({
-			selectNumber: selectNumber,
-			selectValues: prevStates[selectNumber], 
-		}));
-	};
+	getKeyArray(depth) {
+		const { selectValues, selectDepth } = this.state;
+		let obj = OPTIONS;
 
-	onFirstChange = (event) => {
-		const value = event.target.value;
+		if (selectValues.length > 0) {
+			// Step through each depth of the object, using `selectValues` as keys
+			// until we've reached specified depth.
+			for (let i = 0; i < depth; i++) {
+				if (i > selectDepth) break;
+				obj = obj[selectValues[i]];
+			}
+		}
+
+		// If object is not an array, just grab the keys.
+		if (!Array.isArray(obj)) {
+			obj = Object.keys(obj);
+		}
+
+		return obj;
+	}
+
+	/* Handle select input change. Parameter `depth` indicates how much 
+	'progress' the user has made in selections. If the user changes a select 
+	that precedes another select, all following selects will be cleared / 
+	reset / disabled depending on what's applicable. */
+	onChange(depth, value) {
+		let { selectValues } = this.state;
+
+		// If selected value is none, it's the same as if the user changed the
+		// select element a level up.
+		if (!value) depth -= 1;
+
+		// Update selectValues with user's selection.
+		if (depth < selectValues.length) {
+			if (value) selectValues[depth] = value;
+			while(depth + 1 < selectValues.length) selectValues.pop();
+		} else {
+			selectValues.push(value);
+		}
+
 		this.setState({
-			firstSelectOptions: second[value],
-			firstSelectValue: value,
-			secondSelectValue: '',
+			selectDepth: depth,
+			selectValues: selectValues, 
 		});
 	};
 
-	onSecondChange = (event) => {
-		const value = event.target.value;
-		this.setState({
-			secondSelectValue: value,
-		});
-	};
+	createSelects() {
+		let jsx = [];
+		const { selectDepth, selectValues } = this.state;
+		const nLevels = N_LEVELS;
+
+		for (let i = 0; i < nLevels; i++) {
+			const thisIndex = i;
+			const thisValue = selectValues[i] || '';
+			const thisOptions = this.getKeyArray(i);
+			const disabled = (i > selectDepth + 1);
+
+			jsx.push(
+				<Grid xs={4} key={i} item>
+					<TextField
+						fullWidth
+						select
+						disabled={disabled}
+						value={thisValue}
+						onChange={(e) => 
+							this.onChange(thisIndex, e.target.value)}
+						variant='outlined'
+						label={LABELS[i]}
+					>
+						<MenuItem value=''><em>None</em></MenuItem>
+						{thisOptions.map(option => (
+							<MenuItem key={option} value={option}>
+								{option}
+							</MenuItem>
+						))}
+					</TextField>
+				</Grid>
+			);
+		}
+
+		return jsx;
+	}
 
 	render() {
 		const { classes } = this.props;
-		const { firstSelectOptions, firstSelectValue, secondSelectValue } = this.state;
 
 		return (
 			<div className={classes.root}>
@@ -81,39 +151,7 @@ class App extends React.Component {
 				<Card className={classes.card}>
 					<CardContent>
 						<Grid container spacing={24}>
-							<Grid xs={6} item>
-								<TextField
-									fullWidth
-									select
-									value={firstSelectValue}
-									onChange={this.onFirstChange}
-									variant='outlined'
-									label='First'
-								>
-									{first.map(option => (
-										<MenuItem key={option} value={option}>
-											{option}
-										</MenuItem>
-									))}
-								</TextField>
-							</Grid>
-							<Grid xs={6} item>
-								<TextField
-									fullWidth
-									select
-									value={secondSelectValue}
-									label='Second'
-									onChange={this.onSecondChange}
-									variant='outlined'
-								>
-									<MenuItem value=''><em>None</em></MenuItem>
-									{firstSelectOptions.map(option => (
-										<MenuItem key={option} value={option}>
-											{option}
-										</MenuItem>
-									))}
-								</TextField>
-							</Grid>
+							{ this.createSelects() }
 						</Grid>
 					</CardContent>
 				</Card>
